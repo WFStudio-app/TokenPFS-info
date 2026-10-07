@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokenPFS — локальная фабрика токенов ИИ | Документация</title>
+<meta name="description" content="TokenPFS — запуск 42 локальных LLM-моделей через Ollama на любом железе и в Termux. Автоподбор токенов /autt, параллельные вопросы моделям, загрузка своих моделей с GitHub.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+
+<nav class="navbar" id="top">
+  <div class="container nav-inner">
+    <a href="#top" class="logo">⚡ Token<span>PFS</span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="#features">Функции</a>
+      <a href="#models">Модели</a>
+      <a href="#install">Установка</a>
+      <a href="#commands">Команды</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/WFStudio-app/TokenPFS" target="_blank" class="btn btn-sm btn-primary">GitHub ↗</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Меню">☰</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <div class="badge-row">
+        <span class="badge">v1.1.1</span>
+        <span class="badge badge-green">Termux-ready</span>
+        <span class="badge badge-purple">Ollama powered</span>
+      </div>
+      <h1>TokenPFS</h1>
+      <p class="lead">Локальная фабрика токенов для ИИ-моделей. Выбери одну из 42 моделей, скачай её одной командой и генерируй ответы прямо на своём железе — хоть на телефоне в Termux, хоть на сервере. Несколько моделей работают параллельно, скорость генерации подбирается автоматически под твоё устройство.</p>
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ Установить за 2 минуты</a>
+        <a href="#features" class="btn btn-ghost">Смотреть функции</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>42</b><span>модели в каталоге</span></div>
+        <div><b>∞</b><span>параллельных запросов</span></div>
+        <div><b>/autt</b><span>автоподбор tok/s</span></div>
+        <div><b>0</b><span>облака и подписки</span></div>
+      </div>
+    </div>
+    <div class="hero-term">
+      <div class="term-bar"><i></i><i></i><i></i><span>tokenpfs — live dashboard</span></div>
+      <pre class="term-body"><code><span class="dim">$</span> python3 tokenpfs_app.py
+<span class="cyan">[01]</span> <span class="green">Model ready:</span> qwen2.5:0.5b (0.4 GB)
+<span class="dim">stt&gt;</span> /w 01 Привет! Как дела?
+<span class="orange">⚙ [qwen2.5:0.5b] [generating (9 tok)] [45.2 tok/s] [ready in 11s]</span>
+<span class="green">&gt; [qwen2.5:0.5b] - Привет! Отлично, работаю локально…</span> <span class="dim">[0.6s] [28 tok]</span>
+<span class="dim">stt&gt;</span> /autt
+<span class="cyan">POWER SCORE: 25.1/100 → class: phone / SBC</span>
+<span class="cyan">Recommended: /stf 44.0 tokens/sec</span>
+<span class="dim">stt&gt;</span> <span class="blink">▊</span></code></pre>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="features">
+  <div class="container">
+    <h2>✨ Что умеет TokenPFS</h2>
+    <p class="section-sub">Каждая функция — отдельный модуль по слоям: <code>core → utils → modules</code>.</p>
+    <div class="grid grid-3">
+
+      <div class="card">
+        <div class="ico">🧰</div>
+        <h3>Каталог из 42 моделей</h3>
+        <p>Llama, Qwen, Phi, Gemma, DeepSeek, Mistral, Mixtral… от лёгких 0.4 ГБ до тяжёлых <b>&gt;16 ГБ</b> (проверка свободного места перед скачиванием).</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">📥</div>
+        <h3>Download [модель]? Y/n</h3>
+        <p>После выбора модели появляется окно подтверждения, затем живой прогресс-бар загрузки. Готовой модели сразу присваивается номер <code>[01]</code>, <code>[02]</code>…</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">💬</div>
+        <h3>Вопросы /w</h3>
+        <p><code>/w [номер/имя модели] [текст]</code> — модель генерирует ответ локально. Ответ оформляется так: <code>&gt; [модель] - [ответ] [время] [токены]</code>.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">🎛️</div>
+        <h3>Скорость /stf</h3>
+        <p><code>/stf [токенов в секунду]</code> — вручную ограничиваешь потребление, чтобы телефон или сервер не перегревался.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">🧠</div>
+        <h3>Автоподбор /autt</h3>
+        <p>Замеряет мощность железа (CPU/RAM/disk), считает <b>POWER SCORE</b> и сам рекомендует, сколько токенов в секунду потянет устройство.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">🔀</div>
+        <h3>Параллельная работа</h3>
+        <p>Одновременно можно задать вопрос второй, третьей, пятой модели — все генерируют параллельно, а live-дашборд показывает статус каждой.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">📊</div>
+        <h3>Live-статус генерации</h3>
+        <p>Во время ответа видно строку:<br><code>[модель] [что делает] [tok/s] [через сколько готова]</code> — без ожидания вслепую.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">🐙</div>
+        <h3>Свои модели /dnm</h3>
+        <p><code>/dnm [ссылка на GitHub/HuggingFace]</code> — загружай любые GGUF-модели из репозиториев, им тоже присваивается номер.</p>
+      </div>
+
+      <div class="card">
+        <div class="ico">📁</div>
+        <h3>Локальные файлы /dnmf</h3>
+        <p><code>/dnmf [путь к файлу .gguf]</code> — подключай уже скачанные модели с устройства. Удаление — <code>/delm [имя/номер]</code>.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="models">
+  <div class="container">
+    <h2>🧰 Каталог моделей</h2>
+    <p class="section-sub">42 модели встроены в каталог. Тяжёлые (&gt;16 ГБ) помечены <span class="badge badge-red">HEAVY</span> — программа предупредит, если SSD не тянет.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Пример</th><th>Размер</th><th>Для какого железа</th></tr></thead>
+        <tbody>
+          <tr><td><code>qwen2.5:0.5b</code>, <code>phi3:mini</code></td><td>0.4–2.2 ГБ</td><td>Телефон / Termux, Raspberry Pi</td></tr>
+          <tr><td><code>llama3.2:3b</code>, <code>gemma2:2b</code>, <code>deepseek-r1:1.5b</code></td><td>1.3–3.4 ГБ</td><td>Ноутбук 8 ГБ RAM</td></tr>
+          <tr><td><code>llama3.1:8b</code>, <code>qwen2.5:7b</code>, <code>mistral:7b</code></td><td>4.1–4.7 ГБ</td><td>ПК 16 ГБ RAM</td></tr>
+          <tr><td><code>qwen2.5:32b</code>, <code>llama3.3:70b-instruct-q4</code></td><td>18–40 ГБ</td><td>Сервер / рабочая станция <span class="badge badge-red">HEAVY</span></td></tr>
+          <tr><td><code>mixtral:8x22b</code>, <code>mistral-large</code></td><td>40–46 ГБ</td><td>GPU-сервер <span class="badge badge-red">HEAVY</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Актуальный полный список — командой <code>/models</code> внутри программы.</p>
+  </div>
+</section>
+
+<section class="section" id="install">
+  <div class="container">
+    <h2>🚀 Установка</h2>
+    <p class="section-sub">Работает в Termux (Android) и на любом Linux. Нужен Python 3.8+ и Ollama.</p>
+
+    <h3>📱 Termux</h3>
+    <ol class="steps">
+      <li>Установи <b>Termux из F-Droid</b> (не из Play Market — там устаревшая версия).</li>
+      <li>Выполни команды по очереди (нажми на блок, чтобы скопировать):</li>
+    </ol>
+    <pre class="code-block" data-copy>pkg update && pkg install python git ollama -y</pre>
+    <pre class="code-block" data-copy>ollama serve &amp;</pre>
+    <pre class="code-block" data-copy>git clone https://github.com/WFStudio-app/TokenPFS.git
+cd TokenPFS && python3 tokenpfs_app.py</pre>
+    <li>Программа сама подскажет, что делать дальше: <code>/models</code> → <code>/dl 01</code> → <code>/w 01 вопрос</code>.</li>
+
+    <h3>🖥️ Linux / сервер</h3>
+    <pre class="code-block" data-copy>curl -fsSL https://ollama.com/install.sh | sh
+git clone https://github.com/WFStudio-app/TokenPFS.git
+cd TokenPFS && python3 tokenpfs_app.py</pre>
+
+    <h3>🌍 Удалённый Ollama-сервер</h3>
+    <p>Если модели должны считаться на мощной машине, а интерфейс запущен на телефоне:</p>
+    <pre class="code-block" data-copy>TOKENPFS_OLLAMA_URL=http://192.168.1.50:11434 python3 tokenpfs_app.py</pre>
+
+    <h3>🧪 Без Ollama</h3>
+    <p>Если Ollama недоступен, программа запускается в DEMO-режиме — можно изучить весь интерфейс и команды, но ответы будут фиктивными.</p>
+  </div>
+</section>
+
+<section class="section section-alt" id="commands">
+  <div class="container">
+    <h2>⌨️ Команды</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Команда</th><th>Что делает</th></tr></thead>
+        <tbody>
+          <tr><td><code>/models</code></td><td>Каталог всех 42 моделей с номерами и размерами</td></tr>
+          <tr><td><code>/dl [номер/имя]</code></td><td>Скачать модель (с подтверждением Download? Y/n и прогрессом)</td></tr>
+          <tr><td><code>/w [модель] [текст]</code></td><td>Задать вопрос модели; несколько вопросов разным моделям идут параллельно</td></tr>
+          <tr><td><code>/stf [число]</code></td><td>Сколько токенов в секунду вырабатывать (0.1–1000)</td></tr>
+          <tr><td><code>/autt</code></td><td>Замер мощности железа → POWER SCORE → рекомендация tok/s</td></tr>
+          <tr><td><code>/dnm [ссылка]</code></td><td>Загрузить свою модель с GitHub / HuggingFace (.gguf)</td></tr>
+          <tr><td><code>/dnmf [путь]</code></td><td>Подключить локальный файл модели с устройства</td></tr>
+          <tr><td><code>/delm [имя/номер]</code></td><td>Удалить модель из списка</td></tr>
+          <tr><td><code>/jobs</code></td><td>Статус всех текущих генераций</td></tr>
+          <tr><td><code>/status</code></td><td>Состояние Ollama и скачанных моделей</td></tr>
+          <tr><td><code>/help</code></td><td>Список команд прямо в терминале</td></tr>
+          <tr><td><code>quit</code></td><td>Корректный выход (ждёт незавершённые ответы)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container">
+    <h2>❓ FAQ</h2>
+    <div class="faq-item"><b>Это бесплатно?</b><p>Да. Модели считаются локально через Ollama — ни облака, ни подписок, ни лимитов провайдера.</p></div>
+    <div class="faq-item"><b>Потянет ли обычный телефон?</b><p>Да, лёгкие модели (0.4–2 ГБ). Запусти <code>/autt</code> — программа сама оценит железо и подскажет безопасную скорость генерации.</p></div>
+    <div class="faq-item"><b>Можно ли говорить с несколькими моделями сразу?</b><p>Да — это ядро проекта. Каждый <code>/w</code> запускает отдельный поток; дашборд показывает прогресс всех генераций одновременно.</p></div>
+    <div class="faq-item"><b>Что если модель не помещается на SSD?</b><p>Перед скачиванием тяжёлой модели (&gt;16 ГБ) TokenPFS проверяет свободное место и предупреждает заранее.</p></div>
+    <div class="faq-item"><b>Где хранятся модели?</b><p>В стандартном каталоге Ollama; реестр номеров — <code>~/.tokenpfs/models.json</code>.</p></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>⚡ TokenPFS v1.1.1 — MIT License · <a href="https://github.com/WFStudio-app/TokenPFS">GitHub</a> · <a href="https://github.com/WFStudio-app/TokenPFS/releases/tag/v1.1.1">Релиз v1.1.1</a> · <a href="https://wfstudio-app.github.io/STT-info/">STT Pro docs</a></p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
