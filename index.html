@@ -100,7 +100,7 @@ footer a:hover{color:var(--fg)}
 
 <main id="top">
 <div class="wrap hero">
-<div class="badges"><span>v1.1.2</span><span>Termux-ready</span><span>Ollama</span><span>MIT</span></div>
+<div class="badges"><span>v2.0.0-alpha</span><span>Termux-ready</span><span>Ollama</span><span>MIT</span></div>
 <h1>TokenPFS</h1>
 <p class="lead">Локальная фабрика токенов для ИИ-моделей. Выбери одну из <b>42 моделей</b>, скачай одной командой и генерируй ответы на своём железе: на телефоне в Termux или на сервере. Несколько моделей работают параллельно, а скорость подбирается под твоё устройство.</p>
 <div class="cta"><a class="btn fill" href="#install">Установить за 2 минуты</a><a class="btn" href="#features">Смотреть функции</a></div>
@@ -148,6 +148,7 @@ footer a:hover{color:var(--fg)}
 <section id="install" style="border-top:1px solid var(--line)"><div class="wrap">
 <h2>Установка</h2>
 <p class="sub">Нужен только терминал. Скрипт определит систему, поставит Python, Git и Ollama, скачает TokenPFS и добавит команду <code>tokenpfs</code>.</p>
+<div class="note" style="border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0;font-family:monospace">🧭 <b>v2.0.0-alpha — поддержка платформ:</b> 🪟 Windows (нативный install.ps1, без WSL) · 🍎 macOS (Intel/Apple Silicon) · ☁️ VPS/облако (headless по SSH под root, без sudo, автоопределение виртуализации в <code>/autt</code>) · 🐧 Linux / 📱 Termux</div>
 <div class="tabs" role="tablist">
 <button class="tab" role="tab" data-p="linux" aria-selected="true">Linux / VPS</button>
 <button class="tab" role="tab" data-p="termux" aria-selected="false">Termux</button>
@@ -193,13 +194,16 @@ cd TokenPFS &amp;&amp; python3 tokenpfs_app.py</pre><button>Копировать
 
 <div class="panel" id="p-win">
 <h3>Windows 10/11</h3>
-<p>TokenPFS работает через WSL2 (рекомендуется) или напрямую с Python. Открой <b>PowerShell</b>.</p>
-<h3>Способ A: WSL2</h3>
+<p><b>v2.0.0-alpha:</b> появился нативный установщик для Windows — WSL больше не обязателен. Открой <b>PowerShell</b>.</p>
+<h3>Способ A: автоустановка одной командой (рекомендуется)</h3>
+<div class="code"><pre>iwr -useb https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.ps1 | iex</pre><button>Копировать</button></div>
+<p>Скрипт сам поставит Python и Git через winget, скачает официальный OllamaSetup.exe (тихая установка), клонирует TokenPFS в <code>%USERPROFILE%\.tokenpfs\TokenPFS</code> и добавит команду <code>tokenpfs</code>. После этого открой <b>новый</b> терминал и выполни <code>tokenpfs</code>.</p>
+<h3>Способ B: WSL2 (если предпочитаешь Linux-окружение)</h3>
 <div class="code"><pre>wsl --install -d Ubuntu</pre><button>Копировать</button></div>
 <p>После перезагрузки открой Ubuntu и выполни автоустановку:</p>
 <div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button>Копировать</button></div>
 <p>Запуск из терминала Ubuntu: <code>tokenpfs</code>. Ollama доступен и из Windows по адресу <code>http://localhost:11434</code>.</p>
-<h3>Способ B: чистый Python</h3>
+<h3>Способ C: чистый Python вручную</h3>
 <ol><li>Установи <a href="https://ollama.com/download/windows">Ollama для Windows</a> (.exe).</li><li>Установи <a href="https://www.python.org/downloads/">Python 3.10+</a> с галочкой «Add to PATH».</li><li>В PowerShell выполни:</li></ol>
 <div class="code"><pre>git clone https://github.com/WFStudio-app/TokenPFS.git
 cd TokenPFS
@@ -264,8 +268,8 @@ OLLAMA_HOST=0.0.0.0:11434 ollama serve</pre><button>Копировать</button
 </main>
 
 <footer><div class="wrap">
-<span>TokenPFS v1.1.2 — MIT License</span>
-<span><a href="https://github.com/WFStudio-app/TokenPFS">GitHub</a> &nbsp; <a href="https://github.com/WFStudio-app/TokenPFS/releases/tag/v1.1.2">Релиз v1.1.2</a> &nbsp; <a href="https://wfstudio-app.github.io/STT-info/">STT Pro docs</a></span>
+<span>TokenPFS v2.0.0-alpha — MIT License</span>
+<span><a href="https://github.com/WFStudio-app/TokenPFS">GitHub</a> &nbsp; <a href="https://github.com/WFStudio-app/TokenPFS/releases/tag/v2.0.0-alpha">Релиз v2.0.0-alpha</a> &nbsp; <a href="https://wfstudio-app.github.io/STT-info/">STT Pro docs</a></span>
 </div></footer>
 
 <script>
