@@ -43,3 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
     io.observe(el);
   });
 });
+
+// ---------- install tabs + автодетект ОС ----------
+(function () {
+  const tabs = document.querySelectorAll('#osTabs .tab');
+  const panels = document.querySelectorAll('.os-panel');
+  function activate(os) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.os === os));
+    panels.forEach(p => p.classList.toggle('active', p.dataset.os === os));
+  }
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.os)));
+  // автоопределение платформы пользователя
+  const ua = navigator.userAgent.toLowerCase();
+  let guess = 'linux';
+  if (/android/.test(ua)) guess = 'termux';
+  else if (/mac|iphone|ipad/.test(ua)) guess = 'macos';
+  else if (/win/.test(ua)) guess = 'windows';
+  if (document.querySelector('#osTabs')) setTimeout(() => activate(guess), 50);
+})();

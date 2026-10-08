@@ -29,7 +29,7 @@
   <div class="container hero-grid">
     <div class="hero-text">
       <div class="badge-row">
-        <span class="badge">v1.1.1</span>
+        <span class="badge">v1.1.2</span>
         <span class="badge badge-green">Termux-ready</span>
         <span class="badge badge-purple">Ollama powered</span>
       </div>
@@ -148,29 +148,118 @@
 <section class="section" id="install">
   <div class="container">
     <h2>🚀 Установка</h2>
-    <p class="section-sub">Работает в Termux (Android) и на любом Linux. Нужен Python 3.8+ и Ollama.</p>
+    <p class="section-sub">Выбери свою платформу выше — команды подставятся автоматически. Нужен только терминал: скрипт сам определит систему, установит Python, Git и Ollama, скачает TokenPFS и добавит команду запуска <code>tokenpfs</code>.</p>
 
-    <h3>📱 Termux</h3>
-    <ol class="steps">
-      <li>Установи <b>Termux из F-Droid</b> (не из Play Market — там устаревшая версия).</li>
-      <li>Выполни команды по очереди (нажми на блок, чтобы скопировать):</li>
-    </ol>
-    <pre class="code-block" data-copy>pkg update && pkg install python git ollama -y</pre>
-    <pre class="code-block" data-copy>ollama serve &amp;</pre>
-    <pre class="code-block" data-copy>git clone https://github.com/WFStudio-app/TokenPFS.git
-cd TokenPFS && python3 tokenpfs_app.py</pre>
-    <li>Программа сама подскажет, что делать дальше: <code>/models</code> → <code>/dl 01</code> → <code>/w 01 вопрос</code>.</li>
+    <!-- ===== переключатель платформ ===== -->
+    <div class="tabs" id="osTabs" role="tablist">
+      <button class="tab active" data-os="linux">🐧 Linux / VPS</button>
+      <button class="tab" data-os="termux">📱 Termux (Android)</button>
+      <button class="tab" data-os="windows">🪟 Windows</button>
+      <button class="tab" data-os="macos">🍎 macOS</button>
+      <button class="tab" data-os="remote">🌍 Удалённый Ollama</button>
+    </div>
 
-    <h3>🖥️ Linux / сервер</h3>
-    <pre class="code-block" data-copy>curl -fsSL https://ollama.com/install.sh | sh
+    <!-- ===== LINUX ===== -->
+    <div class="os-panel active" data-os="linux">
+      <h3>⚡ Один клик — автоустановка</h3>
+      <p>Просто вставь эту команду в терминал — она делает всё: ставит зависимости, клонирует репозиторий, запускает Ollama и создаёт команду <code>tokenpfs</code>:</p>
+      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <h3>🧭 Что произойдёт после установки</h3>
+      <ol class="steps">
+        <li>Открой новый терминал (или выполни <code>source ~/.bashrc</code>) и запусти: <code>tokenpfs</code></li>
+        <li>Программа сама проверит железо и предложит модель под него (<code>/autt</code>).</li>
+        <li>Дальше по меню: <code>/models</code> → <code>/dl 01</code> → <code>/w 01 вопрос</code>.</li>
+      </ol>
+      <details class="manual-fold">
+        <summary>🔧 Ручная установка (если не доверяешь curl | bash)</summary>
+        <div class="code-wrap"><pre># Debian / Ubuntu
+sudo apt update && sudo apt install -y python3 git curl
+
+# Fedora / RHEL
+sudo dnf install -y python3 git curl
+
+# Arch
+sudo pacman -S --noconfirm python git curl
+
+# Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+systemctl --user enable --now ollama 2>/dev/null || ollama serve &amp;
+
+# TokenPFS
 git clone https://github.com/WFStudio-app/TokenPFS.git
-cd TokenPFS && python3 tokenpfs_app.py</pre>
+cd TokenPFS && python3 tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      </details>
+    </div>
 
-    <h3>🌍 Удалённый Ollama-сервер</h3>
-    <p>Если модели должны считаться на мощной машине, а интерфейс запущен на телефоне:</p>
-    <pre class="code-block" data-copy>TOKENPFS_OLLAMA_URL=http://192.168.1.50:11434 python3 tokenpfs_app.py</pre>
+    <!-- ===== TERMUX ===== -->
+    <div class="os-panel" data-os="termux">
+      <h3>📱 Termux (Android)</h3>
+      <ol class="steps">
+        <li>Установи <b>Termux из F-Droid</b> (не из Play Market — там устаревшая версия).</li>
+        <li>Вставь одну команду — автоустановщик сам поставит Python, Git и Ollama:</li>
+      </ol>
+      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <ol class="steps" start="3">
+        <li>Запусти: <code>tokenpfs</code> (после <code>source ~/.bashrc</code> или нового сеанса Termux).</li>
+        <li>Совет: включи <i>Acquire wakelock</i> в уведомлении Termux, чтобы генерация не останавливалась при блокировке экрана.</li>
+        <li>На слабых телефонах используй лёгкие модели (0.5B–1.5B) и <code>/autt</code> для подбора tok/s.</li>
+      </ol>
+      <details class="manual-fold">
+        <summary>🔧 Вручную по шагам</summary>
+        <div class="code-wrap"><pre>pkg update && pkg install python git ollama -y
+ollama serve &amp;
+git clone https://github.com/WFStudio-app/TokenPFS.git
+cd TokenPFS && python3 tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      </details>
+    </div>
 
-    <h3>🧪 Без Ollama</h3>
+    <!-- ===== WINDOWS ===== -->
+    <div class="os-panel" data-os="windows">
+      <h3>🪟 Windows 10/11</h3>
+      <p>TokenPFS работает через WSL2 (рекомендуется) или напрямую с Python. Открой <b>PowerShell</b>:</p>
+      <h4>Способ A — WSL2 (рекомендуется)</h4>
+      <div class="code-wrap"><pre>wsl --install -d Ubuntu</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <p>После перезагрузки открой «Ubuntu» и выполни одну команду автоустановки:</p>
+      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <p>Запуск из Ubuntu-терминала: <code>tokenpfs</code>. Можно также открыть сайт из WSL по адресу <code>http://localhost:11434</code> — Ollama доступен и из Windows.</p>
+      <h4>Способ B — чистый Python без WSL</h4>
+      <ol class="steps">
+        <li>Установи <a href="https://ollama.com/download/windows" target="_blank">Ollama для Windows</a> (обычный .exe-инсталлятор).</li>
+        <li>Установи <a href="https://www.python.org/downloads/" target="_blank">Python 3.10+</a> (галочка «Add to PATH»). Официального apt/pkg в Windows нет — это единственный ручной путь.</li>
+        <li>Открой PowerShell и выполни:</li>
+      </ol>
+      <div class="code-wrap"><pre>git clone https://github.com/WFStudio-app/TokenPFS.git
+cd TokenPFS
+python tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
+    </div>
+
+    <!-- ===== MACOS ===== -->
+    <div class="os-panel" data-os="macos">
+      <h3>🍎 macOS (Intel / Apple Silicon)</h3>
+      <p>Apple Silicon — идеальная платформа: Metal ускоряет Ollama «из коробки». Открой <b>Терминал</b>:</p>
+      <h4>Автоустановка (нужен Homebrew)</h4>
+      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <h4>Или вручную</h4>
+      <div class="code-wrap"><pre>brew install ollama python git
+brew services start ollama
+git clone https://github.com/WFStudio-app/TokenPFS.git
+cd TokenPFS && python3 tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <p>Нет Homebrew? Установи его одной командой с <a href="https://brew.sh" target="_blank">brew.sh</a>, либо просто скачай <a href="https://ollama.com/download/mac" target="_blank">Ollama.app</a> перетаскиванием в Applications и выполни ручные команды без brew.</p>
+    </div>
+
+    <!-- ===== REMOTE ===== -->
+    <div class="os-panel" data-os="remote">
+      <h3>🌍 Модель считает сервер, интерфейс у тебя</h3>
+      <p>Если мощная машина с GPU есть в сети, а TokenPFS ты хочешь запустить на телефоне или ноутбуке:</p>
+      <h4>1. На сервере</h4>
+      <div class="code-wrap"><pre>curl -fsSL https://ollama.com/install.sh | sh
+OLLAMA_HOST=0.0.0.0:11434 ollama serve</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <h4>2. На клиенте (любая ОС)</h4>
+      <div class="code-wrap"><pre>TOKENPFS_OLLAMA_URL=http://192.168.1.50:11434 tokenpfs</pre><button class="copy-btn" data-copy>Копировать</button></div>
+      <p>Все генерации идут на сервер, локально только интерфейс и логи. Проверить связь: <code>curl http://192.168.1.50:11434/api/tags</code> должен вернуть JSON.</p>
+    </div>
+
+    <h3 style="margin-top:2rem">🧪 Без Ollama</h3>
     <p>Если Ollama недоступен, программа запускается в DEMO-режиме — можно изучить весь интерфейс и команды, но ответы будут фиктивными.</p>
   </div>
 </section>
@@ -213,7 +302,7 @@ cd TokenPFS && python3 tokenpfs_app.py</pre>
 
 <footer class="footer">
   <div class="container">
-    <p>⚡ TokenPFS v1.1.1 — MIT License · <a href="https://github.com/WFStudio-app/TokenPFS">GitHub</a> · <a href="https://github.com/WFStudio-app/TokenPFS/releases/tag/v1.1.1">Релиз v1.1.1</a> · <a href="https://wfstudio-app.github.io/STT-info/">STT Pro docs</a></p>
+    <p>⚡ TokenPFS v1.1.2 — MIT License · <a href="https://github.com/WFStudio-app/TokenPFS">GitHub</a> · <a href="https://github.com/WFStudio-app/TokenPFS/releases/tag/v1.1.2">Релиз v1.1.2</a> · <a href="https://wfstudio-app.github.io/STT-info/">STT Pro docs</a></p>
   </div>
 </footer>
 
