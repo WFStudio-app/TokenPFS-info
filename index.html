@@ -1,183 +1,172 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TokenPFS — локальная фабрика токенов ИИ | Документация</title>
-<meta name="description" content="TokenPFS — запуск 42 локальных LLM-моделей через Ollama на любом железе и в Termux. Автоподбор токенов /autt, параллельные вопросы моделям, загрузка своих моделей с GitHub.">
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="TokenPFS — запуск 42 локальных LLM-моделей через Ollama на любом железе и в Termux.">
+<title>TokenPFS — локальная фабрика токенов ИИ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--fg:#fff;--mid:#a3a3a3;--line:#2e2e2e;--soft:#0f0f0f;--sans:"Bricolage Grotesque",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#fff;--fg:#000;--mid:#595959;--line:#d4d4d4;--soft:#f5f5f5}}
+:root[data-theme="light"]{--bg:#fff;--fg:#000;--mid:#595959;--line:#d4d4d4;--soft:#f5f5f5}
+:root[data-theme="dark"]{--bg:#000;--fg:#fff;--mid:#a3a3a3;--line:#2e2e2e;--soft:#0f0f0f}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(72px + env(safe-area-inset-top,0px))}
+body{background:var(--bg);color:var(--fg);font:400 17px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+code,pre{font-family:var(--mono)}
+code{font-size:.88em;border:1px solid var(--line);padding:1px 6px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;gap:24px;height:64px}
+.logo{font-weight:800;font-size:20px;text-decoration:none;margin-right:auto;letter-spacing:-.02em}
+nav{display:flex;gap:22px;font-size:15px}
+nav a{text-decoration:none;color:var(--mid)}nav a:hover{color:var(--fg)}
+.btn{font:600 15px var(--sans);display:inline-block;padding:12px 22px;border-radius:999px;border:1px solid var(--fg);text-decoration:none;cursor:pointer;background:none;color:var(--fg)}
+.btn.fill{background:var(--fg);color:var(--bg)}
+.btn:hover{opacity:.8}
+#theme{width:40px;height:40px;padding:0;display:grid;place-items:center}
+@media(max-width:760px){nav{display:none}}
+.hero{padding:96px 0 72px}
+.hero h1{font-size:clamp(56px,13vw,176px);line-height:.9;font-weight:800;letter-spacing:-.05em}
+.hero p.lead{max-width:34em;margin:32px 0;font-size:clamp(18px,2.2vw,22px);color:var(--mid)}
+.hero p.lead b{color:var(--fg);font-weight:600}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;font:500 13px var(--mono)}
+.badges span{border:1px solid var(--line);padding:4px 12px;border-radius:999px;color:var(--mid)}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.term{margin-top:64px;border:1px solid var(--fg);border-radius:12px;overflow:hidden}
+.term .bar{display:flex;gap:7px;padding:12px 16px;border-bottom:1px solid var(--line);font:12px var(--mono);color:var(--mid)}
+.term .bar i{width:10px;height:10px;border-radius:50%;border:1px solid var(--mid)}
+.term pre{padding:20px;font-size:14px;line-height:1.75;min-height:250px;white-space:pre-wrap;overflow-x:auto}
+.dim{color:var(--mid)}
+.cur{display:inline-block;width:9px;height:1em;background:var(--fg);vertical-align:-2px;animation:b 1s steps(2) infinite}
+@keyframes b{50%{opacity:0}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stats div{padding:32px 24px;border-right:1px solid var(--line)}.stats div:last-child{border:0}
+.stats b{display:block;font-size:48px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.stats span{color:var(--mid);font-size:14px}
+@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(2){border-right:0}.stats div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+section{padding:96px 0}
+h2{font-size:clamp(34px,5vw,56px);line-height:1.05;font-weight:800;letter-spacing:-.035em;margin-bottom:12px}
+.sub{color:var(--mid);max-width:36em;margin-bottom:48px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.grid article{padding:28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.grid h3{font-size:20px;margin-bottom:8px;letter-spacing:-.01em}
+.grid p{color:var(--mid);font-size:15px}
+.grid .cmd{display:inline-block;font:500 13px var(--mono);border:1px solid var(--fg);padding:2px 8px;border-radius:4px;margin-bottom:14px}
+@media(max-width:860px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px;min-width:560px}
+th,td{text-align:left;padding:16px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;border-bottom:1px solid var(--fg)}
+td:first-child{white-space:nowrap}
+.heavy{font:600 11px var(--mono);background:var(--fg);color:var(--bg);padding:2px 6px;border-radius:3px;margin-left:6px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.tab{font:600 15px var(--sans);padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--mid);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.panel{display:none}.panel.on{display:block}
+.panel h3{font-size:22px;margin:32px 0 10px}.panel h3:first-child{margin-top:0}
+.panel p,.panel li{color:var(--mid);margin-bottom:10px;max-width:46em}
+.panel ol{padding-left:22px}
+.panel b{color:var(--fg)}
+.code{position:relative;margin:14px 0 22px;border:1px solid var(--line);background:var(--soft);border-radius:10px}
+.code pre{padding:18px 90px 18px 18px;overflow-x:auto;font-size:13.5px;line-height:1.7}
+.code button{position:absolute;top:10px;right:10px;font:500 12px var(--mono);padding:6px 12px;border-radius:6px;border:1px solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer}
+details{border:1px solid var(--line);border-radius:10px;margin:14px 0}
+summary{padding:14px 18px;cursor:pointer;font-weight:600;color:var(--fg)}
+details .code{margin:0 14px 14px}
+.note{border-left:2px solid var(--fg);padding:4px 0 4px 16px;color:var(--mid);margin:20px 0}
+.faq details{border:0;border-top:1px solid var(--line);border-radius:0;margin:0}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{padding:22px 0;font-size:20px;list-style:none;display:flex;justify-content:space-between}
+.faq summary::after{content:"+";font-weight:400;font-size:26px;line-height:1}
+.faq details[open] summary::after{content:"−"}
+.faq details p{padding:0 0 22px;color:var(--mid);max-width:42em}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mid);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+footer a:hover{color:var(--fg)}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cur{animation:none}}
+</style>
 </head>
 <body>
+<header><div class="wrap">
+<a class="logo" href="#top">TokenPFS</a>
+<nav aria-label="Разделы"><a href="#features">Функции</a><a href="#models">Модели</a><a href="#install">Установка</a><a href="#commands">Команды</a><a href="#faq">FAQ</a></nav>
+<a class="btn" href="https://github.com/WFStudio-app/TokenPFS">GitHub</a>
+<button class="btn" id="theme" aria-label="Сменить тему">◐</button>
+</div></header>
 
-<nav class="navbar" id="top">
-  <div class="container nav-inner">
-    <a href="#top" class="logo">⚡ Token<span>PFS</span></a>
-    <div class="nav-links" id="navLinks">
-      <a href="#features">Функции</a>
-      <a href="#models">Модели</a>
-      <a href="#install">Установка</a>
-      <a href="#commands">Команды</a>
-      <a href="#faq">FAQ</a>
-      <a href="https://github.com/WFStudio-app/TokenPFS" target="_blank" class="btn btn-sm btn-primary">GitHub ↗</a>
-    </div>
-    <button class="burger" id="burger" aria-label="Меню">☰</button>
-  </div>
-</nav>
+<main id="top">
+<div class="wrap hero">
+<div class="badges"><span>v1.1.2</span><span>Termux-ready</span><span>Ollama</span><span>MIT</span></div>
+<h1>TokenPFS</h1>
+<p class="lead">Локальная фабрика токенов для ИИ-моделей. Выбери одну из <b>42 моделей</b>, скачай одной командой и генерируй ответы на своём железе: на телефоне в Termux или на сервере. Несколько моделей работают параллельно, а скорость подбирается под твоё устройство.</p>
+<div class="cta"><a class="btn fill" href="#install">Установить за 2 минуты</a><a class="btn" href="#features">Смотреть функции</a></div>
+<div class="term" aria-label="Пример работы программы">
+<div class="bar"><i></i><i></i><i></i>&nbsp; tokenpfs — live dashboard</div>
+<pre id="demo" aria-live="off"></pre>
+</div>
+</div>
 
-<header class="hero">
-  <div class="container hero-grid">
-    <div class="hero-text">
-      <div class="badge-row">
-        <span class="badge">v1.1.2</span>
-        <span class="badge badge-green">Termux-ready</span>
-        <span class="badge badge-purple">Ollama powered</span>
-      </div>
-      <h1>TokenPFS</h1>
-      <p class="lead">Локальная фабрика токенов для ИИ-моделей. Выбери одну из 42 моделей, скачай её одной командой и генерируй ответы прямо на своём железе — хоть на телефоне в Termux, хоть на сервере. Несколько моделей работают параллельно, скорость генерации подбирается автоматически под твоё устройство.</p>
-      <div class="hero-actions">
-        <a href="#install" class="btn btn-primary">⚡ Установить за 2 минуты</a>
-        <a href="#features" class="btn btn-ghost">Смотреть функции</a>
-      </div>
-      <div class="hero-stats">
-        <div><b>42</b><span>модели в каталоге</span></div>
-        <div><b>∞</b><span>параллельных запросов</span></div>
-        <div><b>/autt</b><span>автоподбор tok/s</span></div>
-        <div><b>0</b><span>облака и подписки</span></div>
-      </div>
-    </div>
-    <div class="hero-term">
-      <div class="term-bar"><i></i><i></i><i></i><span>tokenpfs — live dashboard</span></div>
-      <pre class="term-body"><code><span class="dim">$</span> python3 tokenpfs_app.py
-<span class="cyan">[01]</span> <span class="green">Model ready:</span> qwen2.5:0.5b (0.4 GB)
-<span class="dim">stt&gt;</span> /w 01 Привет! Как дела?
-<span class="orange">⚙ [qwen2.5:0.5b] [generating (9 tok)] [45.2 tok/s] [ready in 11s]</span>
-<span class="green">&gt; [qwen2.5:0.5b] - Привет! Отлично, работаю локально…</span> <span class="dim">[0.6s] [28 tok]</span>
-<span class="dim">stt&gt;</span> /autt
-<span class="cyan">POWER SCORE: 25.1/100 → class: phone / SBC</span>
-<span class="cyan">Recommended: /stf 44.0 tokens/sec</span>
-<span class="dim">stt&gt;</span> <span class="blink">▊</span></code></pre>
-    </div>
-  </div>
-</header>
+<div class="stats"><div class="wrap" style="display:contents">
+<div><b>42</b><span>модели в каталоге</span></div>
+<div><b>∞</b><span>параллельных запросов</span></div>
+<div><b>/autt</b><span>автоподбор tok/s</span></div>
+<div><b>0</b><span>облака и подписок</span></div>
+</div></div>
 
-<section class="section" id="features">
-  <div class="container">
-    <h2>✨ Что умеет TokenPFS</h2>
-    <p class="section-sub">Каждая функция — отдельный модуль по слоям: <code>core → utils → modules</code>.</p>
-    <div class="grid grid-3">
+<section id="features"><div class="wrap">
+<h2>Что умеет TokenPFS</h2>
+<p class="sub">Каждая функция — отдельный модуль по слоям: <code>core → utils → modules</code>.</p>
+<div class="grid">
+<article><span class="cmd">/models</span><h3>Каталог из 42 моделей</h3><p>Llama, Qwen, Phi, Gemma, DeepSeek, Mistral, Mixtral: от лёгких 0.4 ГБ до тяжёлых более 16 ГБ. Свободное место проверяется до скачивания.</p></article>
+<article><span class="cmd">/dl</span><h3>Скачивание с подтверждением</h3><p>Спрашивает «Download? Y/n», показывает прогресс-бар и присваивает готовой модели номер: <code>[01]</code>, <code>[02]</code>…</p></article>
+<article><span class="cmd">/w</span><h3>Вопросы моделям</h3><p><code>/w [номер/имя] [текст]</code> — ответ генерируется локально и выводится как <code>[модель] - ответ [время] [токены]</code>.</p></article>
+<article><span class="cmd">/stf</span><h3>Ручная скорость</h3><p>Ограничь число токенов в секунду, чтобы телефон или сервер не перегревался.</p></article>
+<article><span class="cmd">/autt</span><h3>Автоподбор</h3><p>Замеряет CPU, RAM и диск, считает <b>POWER SCORE</b> и рекомендует, сколько токенов в секунду потянет устройство.</p></article>
+<article><span class="cmd">/jobs</span><h3>Параллельная работа</h3><p>Спрашивай вторую, третью, пятую модель одновременно. Дашборд показывает статус каждой.</p></article>
+<article><span class="cmd">live</span><h3>Статус генерации</h3><p>Во время ответа видно строку: модель, что делает, tok/s и через сколько будет готово.</p></article>
+<article><span class="cmd">/dnm</span><h3>Свои модели</h3><p>Загружай любые GGUF-модели из репозиториев GitHub и HuggingFace. Им тоже присваивается номер.</p></article>
+<article><span class="cmd">/dnmf</span><h3>Локальные файлы</h3><p>Подключай уже скачанные <code>.gguf</code> с устройства. Удаление: <code>/delm [имя/номер]</code>.</p></article>
+</div></div></section>
 
-      <div class="card">
-        <div class="ico">🧰</div>
-        <h3>Каталог из 42 моделей</h3>
-        <p>Llama, Qwen, Phi, Gemma, DeepSeek, Mistral, Mixtral… от лёгких 0.4 ГБ до тяжёлых <b>&gt;16 ГБ</b> (проверка свободного места перед скачиванием).</p>
-      </div>
+<section id="models" style="border-top:1px solid var(--line)"><div class="wrap">
+<h2>Каталог моделей</h2>
+<p class="sub">Тяжёлые модели (более 16 ГБ) помечены HEAVY. Программа предупредит, если места на диске не хватает. Полный список — команда <code>/models</code>.</p>
+<div class="scroll"><table>
+<tr><th>Примеры</th><th>Размер</th><th>Подходит для</th></tr>
+<tr><td><code>qwen2.5:0.5b</code> <code>phi3:mini</code></td><td>0.4–2.2 ГБ</td><td>Телефон, Termux, Raspberry Pi</td></tr>
+<tr><td><code>llama3.2:3b</code> <code>gemma2:2b</code> <code>deepseek-r1:1.5b</code></td><td>1.3–3.4 ГБ</td><td>Ноутбук с 8 ГБ RAM</td></tr>
+<tr><td><code>llama3.1:8b</code> <code>qwen2.5:7b</code> <code>mistral:7b</code></td><td>4.1–4.7 ГБ</td><td>ПК с 16 ГБ RAM</td></tr>
+<tr><td><code>qwen2.5:32b</code> <code>llama3.3:70b-instruct-q4</code></td><td>18–40 ГБ</td><td>Сервер, рабочая станция <span class="heavy">HEAVY</span></td></tr>
+<tr><td><code>mixtral:8x22b</code> <code>mistral-large</code></td><td>40–46 ГБ</td><td>GPU-сервер <span class="heavy">HEAVY</span></td></tr>
+</table></div>
+</div></section>
 
-      <div class="card">
-        <div class="ico">📥</div>
-        <h3>Download [модель]? Y/n</h3>
-        <p>После выбора модели появляется окно подтверждения, затем живой прогресс-бар загрузки. Готовой модели сразу присваивается номер <code>[01]</code>, <code>[02]</code>…</p>
-      </div>
+<section id="install" style="border-top:1px solid var(--line)"><div class="wrap">
+<h2>Установка</h2>
+<p class="sub">Нужен только терминал. Скрипт определит систему, поставит Python, Git и Ollama, скачает TokenPFS и добавит команду <code>tokenpfs</code>.</p>
+<div class="tabs" role="tablist">
+<button class="tab" role="tab" data-p="linux" aria-selected="true">Linux / VPS</button>
+<button class="tab" role="tab" data-p="termux" aria-selected="false">Termux</button>
+<button class="tab" role="tab" data-p="win" aria-selected="false">Windows</button>
+<button class="tab" role="tab" data-p="mac" aria-selected="false">macOS</button>
+<button class="tab" role="tab" data-p="remote" aria-selected="false">Удалённый Ollama</button>
+</div>
 
-      <div class="card">
-        <div class="ico">💬</div>
-        <h3>Вопросы /w</h3>
-        <p><code>/w [номер/имя модели] [текст]</code> — модель генерирует ответ локально. Ответ оформляется так: <code>&gt; [модель] - [ответ] [время] [токены]</code>.</p>
-      </div>
-
-      <div class="card">
-        <div class="ico">🎛️</div>
-        <h3>Скорость /stf</h3>
-        <p><code>/stf [токенов в секунду]</code> — вручную ограничиваешь потребление, чтобы телефон или сервер не перегревался.</p>
-      </div>
-
-      <div class="card">
-        <div class="ico">🧠</div>
-        <h3>Автоподбор /autt</h3>
-        <p>Замеряет мощность железа (CPU/RAM/disk), считает <b>POWER SCORE</b> и сам рекомендует, сколько токенов в секунду потянет устройство.</p>
-      </div>
-
-      <div class="card">
-        <div class="ico">🔀</div>
-        <h3>Параллельная работа</h3>
-        <p>Одновременно можно задать вопрос второй, третьей, пятой модели — все генерируют параллельно, а live-дашборд показывает статус каждой.</p>
-      </div>
-
-      <div class="card">
-        <div class="ico">📊</div>
-        <h3>Live-статус генерации</h3>
-        <p>Во время ответа видно строку:<br><code>[модель] [что делает] [tok/s] [через сколько готова]</code> — без ожидания вслепую.</p>
-      </div>
-
-      <div class="card">
-        <div class="ico">🐙</div>
-        <h3>Свои модели /dnm</h3>
-        <p><code>/dnm [ссылка на GitHub/HuggingFace]</code> — загружай любые GGUF-модели из репозиториев, им тоже присваивается номер.</p>
-      </div>
-
-      <div class="card">
-        <div class="ico">📁</div>
-        <h3>Локальные файлы /dnmf</h3>
-        <p><code>/dnmf [путь к файлу .gguf]</code> — подключай уже скачанные модели с устройства. Удаление — <code>/delm [имя/номер]</code>.</p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section class="section section-alt" id="models">
-  <div class="container">
-    <h2>🧰 Каталог моделей</h2>
-    <p class="section-sub">42 модели встроены в каталог. Тяжёлые (&gt;16 ГБ) помечены <span class="badge badge-red">HEAVY</span> — программа предупредит, если SSD не тянет.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Пример</th><th>Размер</th><th>Для какого железа</th></tr></thead>
-        <tbody>
-          <tr><td><code>qwen2.5:0.5b</code>, <code>phi3:mini</code></td><td>0.4–2.2 ГБ</td><td>Телефон / Termux, Raspberry Pi</td></tr>
-          <tr><td><code>llama3.2:3b</code>, <code>gemma2:2b</code>, <code>deepseek-r1:1.5b</code></td><td>1.3–3.4 ГБ</td><td>Ноутбук 8 ГБ RAM</td></tr>
-          <tr><td><code>llama3.1:8b</code>, <code>qwen2.5:7b</code>, <code>mistral:7b</code></td><td>4.1–4.7 ГБ</td><td>ПК 16 ГБ RAM</td></tr>
-          <tr><td><code>qwen2.5:32b</code>, <code>llama3.3:70b-instruct-q4</code></td><td>18–40 ГБ</td><td>Сервер / рабочая станция <span class="badge badge-red">HEAVY</span></td></tr>
-          <tr><td><code>mixtral:8x22b</code>, <code>mistral-large</code></td><td>40–46 ГБ</td><td>GPU-сервер <span class="badge badge-red">HEAVY</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>Актуальный полный список — командой <code>/models</code> внутри программы.</p>
-  </div>
-</section>
-
-<section class="section" id="install">
-  <div class="container">
-    <h2>🚀 Установка</h2>
-    <p class="section-sub">Выбери свою платформу выше — команды подставятся автоматически. Нужен только терминал: скрипт сам определит систему, установит Python, Git и Ollama, скачает TokenPFS и добавит команду запуска <code>tokenpfs</code>.</p>
-
-    <!-- ===== переключатель платформ ===== -->
-    <div class="tabs" id="osTabs" role="tablist">
-      <button class="tab active" data-os="linux">🐧 Linux / VPS</button>
-      <button class="tab" data-os="termux">📱 Termux (Android)</button>
-      <button class="tab" data-os="windows">🪟 Windows</button>
-      <button class="tab" data-os="macos">🍎 macOS</button>
-      <button class="tab" data-os="remote">🌍 Удалённый Ollama</button>
-    </div>
-
-    <!-- ===== LINUX ===== -->
-    <div class="os-panel active" data-os="linux">
-      <h3>⚡ Один клик — автоустановка</h3>
-      <p>Просто вставь эту команду в терминал — она делает всё: ставит зависимости, клонирует репозиторий, запускает Ollama и создаёт команду <code>tokenpfs</code>:</p>
-      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <h3>🧭 Что произойдёт после установки</h3>
-      <ol class="steps">
-        <li>Открой новый терминал (или выполни <code>source ~/.bashrc</code>) и запусти: <code>tokenpfs</code></li>
-        <li>Программа сама проверит железо и предложит модель под него (<code>/autt</code>).</li>
-        <li>Дальше по меню: <code>/models</code> → <code>/dl 01</code> → <code>/w 01 вопрос</code>.</li>
-      </ol>
-      <details class="manual-fold">
-        <summary>🔧 Ручная установка (если не доверяешь curl | bash)</summary>
-        <div class="code-wrap"><pre># Debian / Ubuntu
-sudo apt update && sudo apt install -y python3 git curl
-
+<div class="panel on" id="p-linux">
+<h3>Автоустановка в одну команду</h3>
+<p>Ставит зависимости, клонирует репозиторий, запускает Ollama и создаёт команду <code>tokenpfs</code>.</p>
+<div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button>Копировать</button></div>
+<h3>После установки</h3>
+<ol><li>Открой новый терминал (или выполни <code>source ~/.bashrc</code>) и запусти <code>tokenpfs</code>.</li><li>Программа проверит железо и предложит модель (<code>/autt</code>).</li><li>Дальше: <code>/models</code> → <code>/dl 01</code> → <code>/w 01 вопрос</code>.</li></ol>
+<details><summary>Ручная установка, если не доверяешь curl | bash</summary>
+<div class="code"><pre># Debian / Ubuntu
+sudo apt update &amp;&amp; sudo apt install -y python3 git curl
 # Fedora / RHEL
 sudo dnf install -y python3 git curl
-
 # Arch
 sudo pacman -S --noconfirm python git curl
 
@@ -187,125 +176,136 @@ systemctl --user enable --now ollama 2>/dev/null || ollama serve &amp;
 
 # TokenPFS
 git clone https://github.com/WFStudio-app/TokenPFS.git
-cd TokenPFS && python3 tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      </details>
-    </div>
+cd TokenPFS &amp;&amp; python3 tokenpfs_app.py</pre><button>Копировать</button></div></details>
+</div>
 
-    <!-- ===== TERMUX ===== -->
-    <div class="os-panel" data-os="termux">
-      <h3>📱 Termux (Android)</h3>
-      <ol class="steps">
-        <li>Установи <b>Termux из F-Droid</b> (не из Play Market — там устаревшая версия).</li>
-        <li>Вставь одну команду — автоустановщик сам поставит Python, Git и Ollama:</li>
-      </ol>
-      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <ol class="steps" start="3">
-        <li>Запусти: <code>tokenpfs</code> (после <code>source ~/.bashrc</code> или нового сеанса Termux).</li>
-        <li>Совет: включи <i>Acquire wakelock</i> в уведомлении Termux, чтобы генерация не останавливалась при блокировке экрана.</li>
-        <li>На слабых телефонах используй лёгкие модели (0.5B–1.5B) и <code>/autt</code> для подбора tok/s.</li>
-      </ol>
-      <details class="manual-fold">
-        <summary>🔧 Вручную по шагам</summary>
-        <div class="code-wrap"><pre>pkg update && pkg install python git ollama -y
+<div class="panel" id="p-termux">
+<h3>Termux (Android)</h3>
+<ol><li>Установи <b>Termux из F-Droid</b>. Версия из Play Market устарела.</li><li>Вставь команду автоустановки:</li></ol>
+<div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button>Копировать</button></div>
+<ol start="3"><li>Запусти <code>tokenpfs</code> (после <code>source ~/.bashrc</code> или нового сеанса).</li><li>Включи <b>Acquire wakelock</b> в уведомлении Termux, чтобы генерация не останавливалась при блокировке экрана.</li><li>На слабых телефонах бери лёгкие модели (0.5B–1.5B) и <code>/autt</code> для подбора tok/s.</li></ol>
+<details><summary>Вручную по шагам</summary>
+<div class="code"><pre>pkg update &amp;&amp; pkg install python git ollama -y
 ollama serve &amp;
 git clone https://github.com/WFStudio-app/TokenPFS.git
-cd TokenPFS && python3 tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      </details>
-    </div>
+cd TokenPFS &amp;&amp; python3 tokenpfs_app.py</pre><button>Копировать</button></div></details>
+</div>
 
-    <!-- ===== WINDOWS ===== -->
-    <div class="os-panel" data-os="windows">
-      <h3>🪟 Windows 10/11</h3>
-      <p>TokenPFS работает через WSL2 (рекомендуется) или напрямую с Python. Открой <b>PowerShell</b>:</p>
-      <h4>Способ A — WSL2 (рекомендуется)</h4>
-      <div class="code-wrap"><pre>wsl --install -d Ubuntu</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <p>После перезагрузки открой «Ubuntu» и выполни одну команду автоустановки:</p>
-      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <p>Запуск из Ubuntu-терминала: <code>tokenpfs</code>. Можно также открыть сайт из WSL по адресу <code>http://localhost:11434</code> — Ollama доступен и из Windows.</p>
-      <h4>Способ B — чистый Python без WSL</h4>
-      <ol class="steps">
-        <li>Установи <a href="https://ollama.com/download/windows" target="_blank">Ollama для Windows</a> (обычный .exe-инсталлятор).</li>
-        <li>Установи <a href="https://www.python.org/downloads/" target="_blank">Python 3.10+</a> (галочка «Add to PATH»). Официального apt/pkg в Windows нет — это единственный ручной путь.</li>
-        <li>Открой PowerShell и выполни:</li>
-      </ol>
-      <div class="code-wrap"><pre>git clone https://github.com/WFStudio-app/TokenPFS.git
+<div class="panel" id="p-win">
+<h3>Windows 10/11</h3>
+<p>TokenPFS работает через WSL2 (рекомендуется) или напрямую с Python. Открой <b>PowerShell</b>.</p>
+<h3>Способ A: WSL2</h3>
+<div class="code"><pre>wsl --install -d Ubuntu</pre><button>Копировать</button></div>
+<p>После перезагрузки открой Ubuntu и выполни автоустановку:</p>
+<div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button>Копировать</button></div>
+<p>Запуск из терминала Ubuntu: <code>tokenpfs</code>. Ollama доступен и из Windows по адресу <code>http://localhost:11434</code>.</p>
+<h3>Способ B: чистый Python</h3>
+<ol><li>Установи <a href="https://ollama.com/download/windows">Ollama для Windows</a> (.exe).</li><li>Установи <a href="https://www.python.org/downloads/">Python 3.10+</a> с галочкой «Add to PATH».</li><li>В PowerShell выполни:</li></ol>
+<div class="code"><pre>git clone https://github.com/WFStudio-app/TokenPFS.git
 cd TokenPFS
-python tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
-    </div>
+python tokenpfs_app.py</pre><button>Копировать</button></div>
+</div>
 
-    <!-- ===== MACOS ===== -->
-    <div class="os-panel" data-os="macos">
-      <h3>🍎 macOS (Intel / Apple Silicon)</h3>
-      <p>Apple Silicon — идеальная платформа: Metal ускоряет Ollama «из коробки». Открой <b>Терминал</b>:</p>
-      <h4>Автоустановка (нужен Homebrew)</h4>
-      <div class="code-wrap"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <h4>Или вручную</h4>
-      <div class="code-wrap"><pre>brew install ollama python git
+<div class="panel" id="p-mac">
+<h3>macOS (Intel / Apple Silicon)</h3>
+<p>На Apple Silicon Ollama ускоряется через Metal без настройки. Открой <b>Терминал</b>.</p>
+<h3>Автоустановка (нужен Homebrew)</h3>
+<div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/WFStudio-app/TokenPFS/main/scripts/install.sh | bash</pre><button>Копировать</button></div>
+<h3>Вручную</h3>
+<div class="code"><pre>brew install ollama python git
 brew services start ollama
 git clone https://github.com/WFStudio-app/TokenPFS.git
-cd TokenPFS && python3 tokenpfs_app.py</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <p>Нет Homebrew? Установи его одной командой с <a href="https://brew.sh" target="_blank">brew.sh</a>, либо просто скачай <a href="https://ollama.com/download/mac" target="_blank">Ollama.app</a> перетаскиванием в Applications и выполни ручные команды без brew.</p>
-    </div>
+cd TokenPFS &amp;&amp; python3 tokenpfs_app.py</pre><button>Копировать</button></div>
+<p>Нет Homebrew? Поставь его с <a href="https://brew.sh">brew.sh</a> или скачай <a href="https://ollama.com/download/mac">Ollama.app</a> и выполни ручные команды без brew.</p>
+</div>
 
-    <!-- ===== REMOTE ===== -->
-    <div class="os-panel" data-os="remote">
-      <h3>🌍 Модель считает сервер, интерфейс у тебя</h3>
-      <p>Если мощная машина с GPU есть в сети, а TokenPFS ты хочешь запустить на телефоне или ноутбуке:</p>
-      <h4>1. На сервере</h4>
-      <div class="code-wrap"><pre>curl -fsSL https://ollama.com/install.sh | sh
-OLLAMA_HOST=0.0.0.0:11434 ollama serve</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <h4>2. На клиенте (любая ОС)</h4>
-      <div class="code-wrap"><pre>TOKENPFS_OLLAMA_URL=http://192.168.1.50:11434 tokenpfs</pre><button class="copy-btn" data-copy>Копировать</button></div>
-      <p>Все генерации идут на сервер, локально только интерфейс и логи. Проверить связь: <code>curl http://192.168.1.50:11434/api/tags</code> должен вернуть JSON.</p>
-    </div>
+<div class="panel" id="p-remote">
+<h3>Модель считает сервер, интерфейс у тебя</h3>
+<p>Если мощная машина с GPU есть в сети, а TokenPFS ты запускаешь на телефоне или ноутбуке.</p>
+<h3>1. На сервере</h3>
+<div class="code"><pre>curl -fsSL https://ollama.com/install.sh | sh
+OLLAMA_HOST=0.0.0.0:11434 ollama serve</pre><button>Копировать</button></div>
+<h3>2. На клиенте (любая ОС)</h3>
+<div class="code"><pre>TOKENPFS_OLLAMA_URL=http://192.168.1.50:11434 tokenpfs</pre><button>Копировать</button></div>
+<p>Все генерации идут на сервер, локально остаются интерфейс и логи. Проверка связи: <code>curl http://192.168.1.50:11434/api/tags</code> должен вернуть JSON.</p>
+</div>
 
-    <h3 style="margin-top:2rem">🧪 Без Ollama</h3>
-    <p>Если Ollama недоступен, программа запускается в DEMO-режиме — можно изучить весь интерфейс и команды, но ответы будут фиктивными.</p>
-  </div>
-</section>
+<p class="note"><b>Без Ollama:</b> программа запустится в DEMO-режиме. Можно изучить интерфейс и команды, но ответы будут фиктивными.</p>
+</div></section>
 
-<section class="section section-alt" id="commands">
-  <div class="container">
-    <h2>⌨️ Команды</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Команда</th><th>Что делает</th></tr></thead>
-        <tbody>
-          <tr><td><code>/models</code></td><td>Каталог всех 42 моделей с номерами и размерами</td></tr>
-          <tr><td><code>/dl [номер/имя]</code></td><td>Скачать модель (с подтверждением Download? Y/n и прогрессом)</td></tr>
-          <tr><td><code>/w [модель] [текст]</code></td><td>Задать вопрос модели; несколько вопросов разным моделям идут параллельно</td></tr>
-          <tr><td><code>/stf [число]</code></td><td>Сколько токенов в секунду вырабатывать (0.1–1000)</td></tr>
-          <tr><td><code>/autt</code></td><td>Замер мощности железа → POWER SCORE → рекомендация tok/s</td></tr>
-          <tr><td><code>/dnm [ссылка]</code></td><td>Загрузить свою модель с GitHub / HuggingFace (.gguf)</td></tr>
-          <tr><td><code>/dnmf [путь]</code></td><td>Подключить локальный файл модели с устройства</td></tr>
-          <tr><td><code>/delm [имя/номер]</code></td><td>Удалить модель из списка</td></tr>
-          <tr><td><code>/jobs</code></td><td>Статус всех текущих генераций</td></tr>
-          <tr><td><code>/status</code></td><td>Состояние Ollama и скачанных моделей</td></tr>
-          <tr><td><code>/help</code></td><td>Список команд прямо в терминале</td></tr>
-          <tr><td><code>quit</code></td><td>Корректный выход (ждёт незавершённые ответы)</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+<section id="commands" style="border-top:1px solid var(--line)"><div class="wrap">
+<h2>Команды</h2>
+<p class="sub">Все команды вводятся прямо в программе. Список всегда под рукой: <code>/help</code>.</p>
+<div class="scroll"><table>
+<tr><th>Команда</th><th>Что делает</th></tr>
+<tr><td><code>/models</code></td><td>Каталог всех 42 моделей с номерами и размерами</td></tr>
+<tr><td><code>/dl [номер/имя]</code></td><td>Скачать модель с подтверждением Y/n и прогрессом</td></tr>
+<tr><td><code>/w [модель] [текст]</code></td><td>Задать вопрос модели; несколько вопросов разным моделям идут параллельно</td></tr>
+<tr><td><code>/stf [число]</code></td><td>Сколько токенов в секунду вырабатывать (0.1–1000)</td></tr>
+<tr><td><code>/autt</code></td><td>Замер мощности железа, POWER SCORE и рекомендация tok/s</td></tr>
+<tr><td><code>/dnm [ссылка]</code></td><td>Загрузить свою модель с GitHub или HuggingFace (.gguf)</td></tr>
+<tr><td><code>/dnmf [путь]</code></td><td>Подключить локальный файл модели</td></tr>
+<tr><td><code>/delm [имя/номер]</code></td><td>Удалить модель из списка</td></tr>
+<tr><td><code>/jobs</code></td><td>Статус всех текущих генераций</td></tr>
+<tr><td><code>/status</code></td><td>Состояние Ollama и скачанных моделей</td></tr>
+<tr><td><code>/help</code></td><td>Список команд в терминале</td></tr>
+<tr><td><code>quit</code></td><td>Выход после завершения незаконченных ответов</td></tr>
+</table></div>
+</div></section>
 
-<section class="section" id="faq">
-  <div class="container">
-    <h2>❓ FAQ</h2>
-    <div class="faq-item"><b>Это бесплатно?</b><p>Да. Модели считаются локально через Ollama — ни облака, ни подписок, ни лимитов провайдера.</p></div>
-    <div class="faq-item"><b>Потянет ли обычный телефон?</b><p>Да, лёгкие модели (0.4–2 ГБ). Запусти <code>/autt</code> — программа сама оценит железо и подскажет безопасную скорость генерации.</p></div>
-    <div class="faq-item"><b>Можно ли говорить с несколькими моделями сразу?</b><p>Да — это ядро проекта. Каждый <code>/w</code> запускает отдельный поток; дашборд показывает прогресс всех генераций одновременно.</p></div>
-    <div class="faq-item"><b>Что если модель не помещается на SSD?</b><p>Перед скачиванием тяжёлой модели (&gt;16 ГБ) TokenPFS проверяет свободное место и предупреждает заранее.</p></div>
-    <div class="faq-item"><b>Где хранятся модели?</b><p>В стандартном каталоге Ollama; реестр номеров — <code>~/.tokenpfs/models.json</code>.</p></div>
-  </div>
-</section>
+<section id="faq" style="border-top:1px solid var(--line)"><div class="wrap faq">
+<h2 style="margin-bottom:40px">FAQ</h2>
+<details><summary>Это бесплатно?</summary><p>Да. Модели считаются локально через Ollama: без облака, подписок и лимитов провайдера.</p></details>
+<details><summary>Потянет ли обычный телефон?</summary><p>Да, лёгкие модели (0.4–2 ГБ). Запусти <code>/autt</code>: программа оценит железо и подскажет безопасную скорость.</p></details>
+<details><summary>Можно ли говорить с несколькими моделями сразу?</summary><p>Да, в этом суть проекта. Каждый <code>/w</code> запускает отдельный поток, а дашборд показывает прогресс всех генераций.</p></details>
+<details><summary>Что если модель не помещается на SSD?</summary><p>Перед скачиванием тяжёлой модели (более 16 ГБ) TokenPFS проверит свободное место и предупредит заранее.</p></details>
+<details><summary>Где хранятся модели?</summary><p>В стандартном каталоге Ollama. Реестр номеров лежит в <code>~/.tokenpfs/models.json</code>.</p></details>
+</div></section>
+</main>
 
-<footer class="footer">
-  <div class="container">
-    <p>⚡ TokenPFS v1.1.2 — MIT License · <a href="https://github.com/WFStudio-app/TokenPFS">GitHub</a> · <a href="https://github.com/WFStudio-app/TokenPFS/releases/tag/v1.1.2">Релиз v1.1.2</a> · <a href="https://wfstudio-app.github.io/STT-info/">STT Pro docs</a></p>
-  </div>
-</footer>
+<footer><div class="wrap">
+<span>TokenPFS v1.1.2 — MIT License</span>
+<span><a href="https://github.com/WFStudio-app/TokenPFS">GitHub</a> &nbsp; <a href="https://github.com/WFStudio-app/TokenPFS/releases/tag/v1.1.2">Релиз v1.1.2</a> &nbsp; <a href="https://wfstudio-app.github.io/STT-info/">STT Pro docs</a></span>
+</div></footer>
 
-<script src="script.js"></script>
+<script>
+// tabs
+document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){
+document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected',x===t)});
+document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t.dataset.p)});}});
+// copy
+document.querySelectorAll('.code button').forEach(function(b){b.onclick=function(){
+var txt=b.previousElementSibling.innerText;
+var ok=function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Копировать'},1500)};
+try{navigator.clipboard.writeText(txt).then(ok,ok)}catch(e){ok()}}});
+// theme
+var r=document.documentElement;
+document.getElementById('theme').onclick=function(){
+var dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#000';
+r.setAttribute('data-theme',dark?'light':'dark');};
+// terminal demo (typed once, static under reduced motion)
+var lines=[
+['$ python3 tokenpfs_app.py'],
+['[01] Model ready: qwen2.5:0.5b (0.4 GB)','dim'],
+['stt> /w 01 Привет! Как дела?'],
+['[qwen2.5:0.5b] generating (9 tok) · 45.2 tok/s · ready in 11s','dim'],
+['> [qwen2.5:0.5b] - Привет! Отлично, работаю локально… [0.6s] [28 tok]'],
+['stt> /autt'],
+['POWER SCORE: 25.1/100 → class: phone / SBC','dim'],
+['Recommended: /stf 44.0 tokens/sec'],
+['stt> ']];
+var el=document.getElementById('demo');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function render(n,part){var h='';for(var i=0;i<n;i++){h+=wrap(lines[i],lines[i][0])+'\n'}
+if(part!==undefined){h+=wrap(lines[n],lines[n][0].slice(0,part))}
+el.innerHTML=h+'<span class="cur"></span>';}
+function wrap(l,s){return l[1]?'<span class="dim">'+esc(s)+'</span>':esc(s)}
+if(matchMedia('(prefers-reduced-motion:reduce)').matches){render(lines.length)}
+else{var li=0,ci=0;(function tick(){
+if(li>=lines.length){render(lines.length-1,lines[lines.length-1][0].length);return}
+var L=lines[li][0];
+if(ci<=L.length){render(li,ci);ci+=lines[li][1]?L.length:2;setTimeout(tick,lines[li][1]?350:22)}
+else{li++;ci=0;setTimeout(tick,250)}})();}
+</script>
 </body>
 </html>
